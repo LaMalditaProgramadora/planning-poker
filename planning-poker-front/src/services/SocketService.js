@@ -2,7 +2,7 @@ import io from "socket.io-client";
 import { v4 as uuidv4 } from "uuid";
 
 export let socket;
-const REACT_APP_SOCKET_URL = `${process.env.REACT_APP_TUTO_HEROKU}`;
+const REACT_APP_SOCKET_URL = process.env.REACT_APP_SOCKET_URL;
 
 export const initiateSocket = (channel, name) => {
   socket = io(REACT_APP_SOCKET_URL, {
