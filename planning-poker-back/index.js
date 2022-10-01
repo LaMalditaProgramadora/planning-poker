@@ -2,8 +2,11 @@ import { createServer } from "http";
 import express from "express";
 import cors from "cors";
 import { Server } from "socket.io";
+import dotenv from "dotenv";
 
 import { socketLogic } from "./socket.js";
+
+dotenv.config();
 
 const app = express();
 app.use(cors());
@@ -19,7 +22,10 @@ app.use(function (req, res, next) {
 
 const server = createServer(app);
 const io = new Server(server, {
-  cors: { origin: "*" },
+  cors: {
+    origin: process.env.REACT_APP_FRONTEND_URL,
+    methods: ["GET", "POST"]
+  }
 });
 
 const PORT = process.env.PORT || 8080;
