@@ -11,12 +11,18 @@ dotenv.config();
 const app = express();
 app.use(cors());
 
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET,OPTIONS,POST");
+  next();
+});
+
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.REACT_APP_FRONTEND_URL,
-    methods: ["GET", "POST"]
-  }
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"],
+  },
 });
 
 const PORT = process.env.PORT || 3000;
