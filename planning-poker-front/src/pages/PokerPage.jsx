@@ -6,74 +6,61 @@ import PokerTable from "../components/PokerTable";
 
 import {
   initiateSocket,
-  subscribeToMessages,
-} from "../helpers/SocketService";
+  subscribeToIsVisibleChange,
+  subscribeToStoryPointsChange,
+} from "../services/SocketService";
+import PokerAverage from "./PokerAverage";
 
 const PokerPage = () => {
   const navigate = useNavigate();
 
-  const [buttonTitle, setButtonTitle] = useState("Revelar");
+  const [isVisible, setIsVisible] = useState(false);
   const [storyPointsAverage, setStoryPointsAverage] = useState("?");
   const name =
     localStorage.getItem("poker-name") === null
-      ? ""
+      ? null
       : localStorage.getItem("poker-name");
   const channel = "planning-poker";
-  const [messages, setMessages] = useState([]);
+  const [storyPoints, setStoryPoints] = useState([]);
 
   const goBack = () => {
     navigate("/", { replace: true });
   };
 
-  const changeButtonTitle = () => {
-    if (buttonTitle === "Revelar") setButtonTitle("Ocultar");
-    else setButtonTitle("Revelar");
-  };
-
-  const revealStoryPoints = () => {
-    changeButtonTitle();
+  const init = () => {
+    if (name === null) {
+      goBack();
+    } else {
+      initiateSocket(channel, name);
+    }
   };
 
   useEffect(() => {
-    initiateSocket(channel, name);
-
-    subscribeToMessages((err, data) => {
-      setMessages(data);
-    });
+    init();
+    if (name !== null) {
+      subscribeToStoryPointsChange((err, data) => {
+        setStoryPoints(data.storyPoints);
+        setStoryPointsAverage(data.storyPointsAverage.toFixed(1));
+        setIsVisible(data.isVisible);
+      });
+      subscribeToIsVisibleChange((err, data) => {
+        setIsVisible(data);
+      });
+    }
+    // eslint-disable-next-line
   }, []);
-
-  const PokerAverage = () => {
-    return (
-      <div className="nes-container with-title is-centered is-dark">
-        <p className="title">Promedio</p>
-        <p>{storyPointsAverage}</p>
-      </div>
-    );
-  };
 
   return (
     <>
-      <Grid container justifyContent="center" className="grid">
-        <PokerAverage />
-      </Grid>
-      <Grid container justifyContent="center" className="grid">
-        <button
-          type="button"
-          className="nes-btn is-primary"
-          onClick={revealStoryPoints}
-        >
-          {buttonTitle}
-        </button>
-      </Grid>
+      <PokerAverage
+        storyPointsAverage={storyPointsAverage}
+        isVisible={isVisible}
+      />
       <Grid container justifyContent="center" className="grid">
         <span className="nes-text is-disabled">------------------</span>
       </Grid>
-      <Grid container justifyContent="center" className="grid">
-        <PokerCards name={name} channel={channel} />
-      </Grid>
-      <Grid container justifyContent="center" className="grid">
-        <PokerTable messages={messages} />
-      </Grid>
+      <PokerCards name={name} channel={channel} />
+      <PokerTable storyPoints={storyPoints} isVisible={isVisible} name={name} />
       <Grid container justifyContent="center" className="grid">
         <button type="button" className="nes-btn is-primary" onClick={goBack}>
           Regresar

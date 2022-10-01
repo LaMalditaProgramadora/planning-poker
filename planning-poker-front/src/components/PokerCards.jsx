@@ -1,5 +1,6 @@
-import { sendMessage } from "../helpers/SocketService";
+import { sendStoryPoint } from "../services/SocketService";
 import { v4 as uuidv4 } from "uuid";
+import { Grid } from "@mui/material";
 
 const PokerCards = ({ name, channel }) => {
   const storyPoints = [1, 2, 3, 5, 8, 13, 20, 40];
@@ -15,11 +16,11 @@ const PokerCards = ({ name, channel }) => {
       user: name,
       body: storyPoint,
     };
-    sendMessage(data);
+    sendStoryPoint(data);
   };
 
   return (
-    <>
+    <Grid container justifyContent="center" className="grid">
       {storyPoints.map((storyPoint, i) => {
         return (
           <button
@@ -33,7 +34,7 @@ const PokerCards = ({ name, channel }) => {
           </button>
         );
       })}
-    </>
+    </Grid>
   );
 };
 
